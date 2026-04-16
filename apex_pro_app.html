@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — Facial Transformation</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0f;--s1:#12121a;--s2:#1a1a25;--s3:#242430;
+  --red:#e8192c;--red2:#ff3347;--red-light:rgba(232,25,44,.1);
+  --w:#fff;--off:#d0d0d8;--dim:#888894;--faint:#3a3a42;
+  --green:#00e87a;--amber:#ffc107;--blue:#3d9aff;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%;overflow-x:hidden}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--w);-webkit-font-smoothing:antialiased;font-size:14px}
+input,select,textarea,button{font-family:'Poppins',sans-serif}
+.page{display:none}.page.active{display:block}
+button{cursor:pointer;border:none;transition:all .2s ease}
+a{color:var(--red);text-decoration:none;cursor:pointer}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
+
+/* ═══ LANDING ═══ */
+.landing{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px 20px;background:linear-gradient(135deg,rgba(232,25,44,.05) 0%,transparent 100%)}
+.landing-logo{font-size:72px;font-weight:800;margin-bottom:20px;background:linear-gradient(135deg,var(--red),var(--red2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.landing-title{font-size:48px;font-weight:800;margin-bottom:16px;line-height:1.2}
+.landing-subtitle{font-size:16px;color:var(--dim);margin-bottom:32px;line-height:1.6;max-width:480px}
+.landing-cta{display:inline-flex;gap:12px}
+.btn-primary{background:linear-gradient(135deg,var(--red),var(--red2));color:var(--w);border:none;padding:16px 40px;border-radius:12px;font-weight:600;font-size:16px;cursor:pointer;transition:all .3s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(232,25,44,.3)}
+.btn-secondary{background:var(--s1);color:var(--w);border:1px solid var(--border2);padding:16px 40px;border-radius:12px;font-weight:600;font-size:16px;cursor:pointer;transition:all .3s}
+.btn-secondary:hover{background:var(--s2);border-color:var(--border)}
+
+/* ═══ SIGNUP FLOW ═══ */
+.signup-wrapper{display:flex;height:100vh;width:100%}
+.signup-sidebar{width:280px;background:var(--s1);border-right:1px solid var(--border);padding:32px 24px;display:flex;flex-direction:column;flex-shrink:0;position:relative;overflow:hidden}
+.signup-sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.signup-logo{font-size:24px;font-weight:800;margin-bottom:48px;background:linear-gradient(135deg,var(--red),var(--red2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.signup-steps{flex:1;display:flex;flex-direction:column;gap:24px}
+.signup-step{display:flex;align-items:center;gap:16px;opacity:.35;transition:all .3s}
+.signup-step.active{opacity:1}
+.signup-step-circle{width:32px;height:32px;border-radius:50%;border:2px solid var(--w);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;transition:all .3s}
+.signup-step.active .signup-step-circle{background:var(--red);border-color:var(--red);box-shadow:0 0 12px rgba(232,25,44,.4)}
+.signup-step-text{flex:1}
+.signup-step-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.signup-step-name{font-size:13px;font-weight:600;color:var(--off);margin-top:2px}
+.signup-step.active .signup-step-name{color:var(--red)}
+.signup-footer{margin-top:auto;padding-top:24px;border-top:1px solid var(--border)}
+.signup-note{font-size:11px;color:var(--dim);line-height:1.6}
+.signup-back{font-size:11px;color:var(--dim);margin-top:12px;display:block;transition:color .2s}
+.signup-back:hover{color:var(--w)}
+
+.signup-body{flex:1;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:48px 32px;overflow-y:auto}
+.signup-form{max-width:480px;width:100%}
+.signup-form-step{display:none;animation:fadeIn .4s ease}
+.signup-form-step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.form-title{font-size:40px;font-weight:800;margin-bottom:12px;line-height:1.1}
+.form-subtitle{font-size:14px;color:var(--dim);margin-bottom:32px;line-height:1.6}
+.form-group{margin-bottom:24px}
+.form-label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:10px}
+.form-input{width:100%;padding:14px 16px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;color:var(--w);font-size:14px;transition:all .2s}
+.form-input:focus{outline:none;border-color:var(--red);background:var(--s3);box-shadow:0 0 12px rgba(232,25,44,.2)}
+.form-input::placeholder{color:var(--dim)}
+.form-select{width:100%;padding:14px 16px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;color:var(--w);font-size:14px;appearance:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-range-wrap{display:flex;align-items:center;gap:16px}
+.form-range{flex:1;accent-color:var(--red);height:6px;border-radius:3px}
+.form-range-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--red);min-width:48px;text-align:right}
+.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.choice-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice-btn{background:var(--s2);border:1px solid var(--border2);padding:12px 10px;border-radius:8px;color:var(--off);font-size:12px;font-weight:600;transition:all .2s;cursor:pointer}
+.choice-btn:hover{background:var(--s3);border-color:var(--border)}
+.choice-btn.selected{background:rgba(232,25,44,.15);border-color:var(--red);color:var(--w)}
+.form-buttons{display:flex;gap:12px;margin-top:32px}
+.btn-next{flex:1;background:linear-gradient(135deg,var(--red),var(--red2));color:var(--w);border:none;padding:14px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(232,25,44,.3)}
+.btn-next:disabled{opacity:.5;cursor:not-allowed}
+.btn-back{flex:1;background:var(--s2);color:var(--off);border:1px solid var(--border2);padding:14px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-back:hover{background:var(--s3);border-color:var(--border)}
+
+/* PHOTO UPLOAD */
+.upload-area{border:2px dashed var(--border2);border-radius:12px;padding:48px 24px;text-align:center;cursor:pointer;transition:all .3s;background:var(--s2)}
+.upload-area:hover,.upload-area.drag{border-color:var(--red);background:rgba(232,25,44,.05)}
+.upload-icon{font-size:48px;margin-bottom:16px}
+.upload-title{font-size:16px;font-weight:600;margin-bottom:8px}
+.upload-subtitle{font-size:12px;color:var(--dim)}
+.upload-preview{max-width:100%;max-height:320px;border-radius:10px;margin-top:16px;display:none}
+
+/* SCANNING */
+.scan-container{display:grid;grid-template-columns:1fr 220px;gap:24px;margin-bottom:24px}
+.scan-image{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border2);background:var(--s2)}
+.scan-image img{width:100%;display:block;filter:brightness(0.7)}
+.scan-beam{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);animation:beam 2.5s ease-in-out infinite;box-shadow:0 0 12px var(--red)}
+@keyframes beam{0%{top:0}50%{top:100%}100%{top:0}}
+.scan-metrics{display:flex;flex-direction:column;gap:10px}
+.metric-box{background:var(--s2);border:1px solid var(--border2);padding:14px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+.metric-label{font-size:11px;color:var(--dim);text-transform:uppercase;font-weight:600}
+.metric-value{font-size:18px;font-weight:700;color:var(--red);font-family:'JetBrains Mono',monospace}
+.scan-status{background:var(--red-light);border:1px solid rgba(232,25,44,.3);padding:14px;border-radius:10px;margin-top:10px}
+.status-label{font-size:10px;color:var(--dim);text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.status-text{font-size:12px;color:var(--red);font-weight:600}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+.progress-fill{height:100%;background:var(--red);width:0%;transition:width .4s ease}
+
+/* ═══ APP DASHBOARD ═══ */
+.app-container{display:flex;flex-direction:column;height:100vh;width:100%}
+.app-header{height:64px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;position:relative;overflow:hidden}
+.app-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.app-header-title{font-size:20px;font-weight:700}
+.app-header-user{display:flex;align-items:center;gap:12px}
+.app-user-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--w)}
+.app-main{flex:1;overflow-y:auto;padding:24px}
+.app-view{display:none}
+.app-view.active{display:block}
+
+/* DASHBOARD GRID */
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.dash-card{background:var(--s1);border:1px solid var(--border);padding:20px;border-radius:12px;transition:all .3s}
+.dash-card:hover{border-color:var(--red);box-shadow:0 8px 24px rgba(232,25,44,.1)}
+.dash-card-label{font-size:11px;color:var(--dim);text-transform:uppercase;font-weight:600;letter-spacing:.5px;margin-bottom:8px}
+.dash-card-value{font-size:36px;font-weight:800;color:var(--w)}
+.dash-card-sub{font-size:12px;color:var(--dim);margin-top:8px}
+.dash-card-sub.up{color:var(--green)}
+
+/* PROTOCOL SECTION */
+.protocol-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.section-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:12px}
+.section-divider{width:4px;height:24px;background:linear-gradient(135deg,var(--red),var(--red2));border-radius:2px}
+
+.protocol-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.phase-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.phase-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--red2));opacity:0;transition:opacity .3s}
+.phase-card:hover{border-color:var(--red);box-shadow:0 8px 24px rgba(232,25,44,.15)}
+.phase-card:hover::before{opacity:1}
+.phase-number{font-size:32px;font-weight:800;color:var(--red);margin-bottom:8px}
+.phase-name{font-size:16px;font-weight:700;margin-bottom:4px}
+.phase-duration{font-size:12px;color:var(--dim)}
+.phase-desc{font-size:13px;color:var(--off);margin-top:12px;line-height:1.5}
+
+.protocol-detail{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px}
+.protocol-detail-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.protocol-icon{width:48px;height:48px;background:var(--red-light);border:1px solid rgba(232,25,44,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.protocol-detail-title{font-size:18px;font-weight:700}
+.protocol-detail-subtitle{font-size:12px;color:var(--dim);margin-top:2px}
+
+.protocol-focus{background:var(--red-light);border:1px solid rgba(232,25,44,.3);padding:16px;border-radius:10px;margin-bottom:20px}
+.focus-label{font-size:10px;color:var(--red);text-transform:uppercase;font-weight:700;letter-spacing:1px;margin-bottom:6px}
+.focus-text{font-size:14px;color:var(--w);line-height:1.6}
+
+.protocol-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.protocol-box{background:var(--s2);border:1px solid var(--border2);padding:16px;border-radius:10px}
+.protocol-box-label{font-size:11px;color:var(--dim);text-transform:uppercase;font-weight:600;margin-bottom:8px}
+.protocol-box-text{font-size:13px;color:var(--off);line-height:1.6}
+
+.supplement-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+.supplement-card{background:var(--s2);border:1px solid var(--border2);padding:14px;border-radius:10px;display:flex;flex-direction:column}
+.supp-name{font-size:13px;font-weight:700;color:var(--w)}
+.supp-dose{font-size:11px;color:var(--red);font-weight:600;margin-top:2px}
+.supp-desc{font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5}
+
+.daily-checklist{background:var(--s2);border:1px solid var(--border2);border-radius:10px;overflow:hidden}
+.checklist-header{padding:16px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;background:var(--s1)}
+.checklist-header-title{font-weight:700;font-size:14px}
+.checklist-header-count{font-size:12px;color:var(--dim)}
+.checklist-item{padding:14px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .2s}
+.checklist-item:last-child{border-bottom:none}
+.checklist-item:hover{background:var(--s1)}
+.checklist-checkbox{width:20px;height:20px;border:2px solid var(--border2);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.checklist-item.done .checklist-checkbox{background:var(--green);border-color:var(--green);color:var(--w)}
+.checklist-label{flex:1;font-size:13px;color:var(--off)}
+.checklist-item.done .checklist-label{text-decoration:line-through;color:var(--dim)}
+.checklist-tag{font-size:10px;background:var(--s2);padding:4px 8px;border-radius:4px;color:var(--dim);white-space:nowrap}
+
+/* RESULTS VIEW */
+.results-score{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:40px;text-align:center;position:relative;overflow:hidden;margin-bottom:24px}
+.results-score::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(232,25,44,.1) 0%,transparent 70%);pointer-events:none}
+.score-label{font-size:12px;color:var(--dim);text-transform:uppercase;font-weight:600;letter-spacing:1px;margin-bottom:12px}
+.score-number{font-size:120px;font-weight:800;background:linear-gradient(135deg,var(--red),var(--red2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.score-tier{font-size:24px;font-weight:700;color:var(--red);margin-top:12px}
+.score-desc{font-size:14px;color:var(--off);max-width:480px;margin:16px auto 0;line-height:1.6}
+
+.metrics-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.metric-card{background:var(--s1);border:1px solid var(--border);padding:20px;border-radius:12px}
+.metric-card-label{font-size:11px;color:var(--dim);text-transform:uppercase;font-weight:600;margin-bottom:12px}
+.metric-card-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px}
+.metric-card-val{font-size:32px;font-weight:800;color:var(--red)}
+.metric-card-bar{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin-top:10px}
+.metric-card-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--red2));border-radius:2px;transition:width 1.5s ease-out}
+
+/* BOTTOM NAV */
+.app-nav{position:fixed;bottom:0;left:0;right:0;height:72px;background:var(--s1);border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;z-index:100}
+.app-nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 16px;cursor:pointer;transition:all .2s;color:var(--dim);text-decoration:none;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.app-nav-item:hover,.app-nav-item.active{color:var(--red)}
+.app-nav-item-icon{font-size:20px}
+
+.app-main{padding-bottom:88px}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .dash-grid{grid-template-columns:repeat(2,1fr)}
+  .protocol-phases{grid-template-columns:1fr}
+  .protocol-grid{grid-template-columns:1fr}
+  .metrics-breakdown{grid-template-columns:1fr}
+  .supplement-grid{grid-template-columns:1fr}
+  .scan-container{grid-template-columns:1fr}
+  .signup-sidebar{display:none}
+  .signup-body{padding:24px}
+}
+@media(max-width:640px){
+  .dash-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .choice-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LANDING PAGE ═══ -->
+<div id="page-landing" class="page active">
+  <div class="landing">
+    <div class="landing-logo">APEX</div>
+    <h1 class="landing-title">Facial Transformation AI</h1>
+    <p class="landing-subtitle">Clinical-grade 68-point facial analysis. Personalized 12-week protocol. No API keys. 100% private.</p>
+    <div class="landing-cta">
+      <button class="btn-primary" onclick="showPage('signup')">Start Analysis</button>
+      <button class="btn-secondary" onclick="scrollToInfo()">Learn More</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SIGNUP FLOW ═══ -->
+<div id="page-signup" class="page">
+  <div class="signup-wrapper">
+    <div class="signup-sidebar">
+      <div class="signup-logo">APEX</div>
+      <div class="signup-steps">
+        <div class="signup-step active" id="step-indicator-1">
+          <div class="signup-step-circle">1</div>
+          <div class="signup-step-text">
+            <div class="signup-step-label">Step 1</div>
+            <div class="signup-step-name">Profile</div>
+          </div>
+        </div>
+        <div class="signup-step" id="step-indicator-2">
+          <div class="signup-step-circle">2</div>
+          <div class="signup-step-text">
+            <div class="signup-step-label">Step 2</div>
+            <div class="signup-step-name">Lifestyle</div>
+          </div>
+        </div>
+        <div class="signup-step" id="step-indicator-3">
+          <div class="signup-step-circle">3</div>
+          <div class="signup-step-text">
+            <div class="signup-step-label">Step 3</div>
+            <div class="signup-step-name">Goals</div>
+          </div>
+        </div>
+        <div class="signup-step" id="step-indicator-4">
+          <div class="signup-step-circle">4</div>
+          <div class="signup-step-text">
+            <div class="signup-step-label">Step 4</div>
+            <div class="signup-step-name">Upload</div>
+          </div>
+        </div>
+        <div class="signup-step" id="step-indicator-5">
+          <div class="signup-step-circle">5</div>
+          <div class="signup-step-text">
+            <div class="signup-step-label">Step 5</div>
+            <div class="signup-step-name">Scan</div>
+          </div>
+        </div>
+      </div>
+      <div class="signup-footer">
+        <div class="signup-note">🔒 AI runs locally in your browser. Your face never leaves your device.</div>
+        <a class="signup-back" onclick="showPage('landing')">← Back to Home</a>
+      </div>
+    </div>
+
+    <div class="signup-body">
+      <div class="signup-form">
+
+        <!-- STEP 1: PROFILE -->
+        <div class="signup-form-step active" id="form-step-1">
+          <h2 class="form-title">Your<br>Profile</h2>
+          <p class="form-subtitle">Let's start with the basics. Be honest—accuracy improves your protocol.</p>
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input class="form-input" id="username" type="text" placeholder="Choose your username">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Age</label>
+              <div class="form-range-wrap">
+                <input class="form-range" type="range" min="15" max="50" value="22" oninput="updateAge(this.value)">
+                <span class="form-range-val" id="ageDisplay">22</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gender</label>
+              <div class="choice-grid-2" id="genderGrid">
+                <button class="choice-btn selected" onclick="selectGender('Male',this)">Male</button>
+                <button class="choice-btn" onclick="selectGender('Female',this)">Female</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Height</label>
+            <select class="form-select" id="height" onchange="userData.height=this.value">
+              <option>5'0"</option><option>5'1"</option><option>5'2"</option><option>5'3"</option><option>5'4"</option><option>5'5"</option><option>5'6"</option><option selected>5'7"</option><option>5'8"</option><option>5'9"</option><option>5'10"</option><option>5'11"</option><option>6'0"</option><option>6'1"</option><option>6'2"</option><option>6'3"</option><option>6'4"</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Weight (lbs)</label>
+            <div class="form-range-wrap">
+              <input class="form-range" type="range" min="100" max="280" value="165" oninput="updateWeight(this.value)">
+              <span class="form-range-val" id="weightDisplay">165</span>
+            </div>
+          </div>
+          <div class="form-buttons">
+            <button class="btn-next" onclick="goStep(2)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: LIFESTYLE -->
+        <div class="signup-form-step" id="form-step-2">
+          <h2 class="form-title">Your<br>Lifestyle</h2>
+          <p class="form-subtitle">Your daily habits determine 60% of your results.</p>
+          <div class="form-group">
+            <label class="form-label">Exercise Per Week</label>
+            <div class="form-range-wrap">
+              <input class="form-range" type="range" min="0" max="7" value="3" step="1" oninput="updateExercise(this.value)">
+              <span class="form-range-val" id="exerciseDisplay">3x/wk</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sleep (hours/night)</label>
+            <div class="form-range-wrap">
+              <input class="form-range" type="range" min="4" max="10" value="7" step=".5" oninput="updateSleep(this.value)">
+              <span class="form-range-val" id="sleepDisplay">7 hrs</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Skin Type</label>
+            <div class="choice-grid" id="skinGrid">
+              <button class="choice-btn" onclick="selectSkin('Oily',this)">Oily</button>
+              <button class="choice-btn selected" onclick="selectSkin('Combination',this)">Combination</button>
+              <button class="choice-btn" onclick="selectSkin('Normal',this)">Normal</button>
+              <button class="choice-btn" onclick="selectSkin('Dry',this)">Dry</button>
+              <button class="choice-btn" onclick="selectSkin('Sensitive',this)">Sensitive</button>
+              <button class="choice-btn" onclick="selectSkin('Acne-prone',this)">Acne-prone</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Diet Type</label>
+            <div class="choice-grid" id="dietGrid">
+              <button class="choice-btn selected" onclick="selectDiet('Omnivore',this)">Omnivore</button>
+              <button class="choice-btn" onclick="selectDiet('High Protein',this)">High Protein</button>
+              <button class="choice-btn" onclick="selectDiet('Mediterranean',this)">Mediterranean</button>
+              <button class="choice-btn" onclick="selectDiet('Vegetarian',this)">Vegetarian</button>
+              <button class="choice-btn" onclick="selectDiet('Vegan',this)">Vegan</button>
+              <button class="choice-btn" onclick="selectDiet('Keto',this)">Keto</button>
+            </div>
+          </div>
+          <div class="form-buttons">
+            <button class="btn-back" onclick="goStep(1)">← Back</button>
+            <button class="btn-next" onclick="goStep(3)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: GOALS -->
+        <div class="signup-form-step" id="form-step-3">
+          <h2 class="form-title">Your<br>Goals</h2>
+          <p class="form-subtitle">What do you want to improve? Select all that apply.</p>
+          <div class="form-group">
+            <div class="choice-grid" id="goalsGrid">
+              <button class="choice-btn" onclick="toggleGoal(this,'Jaw Definition')">Jaw Definition</button>
+              <button class="choice-btn" onclick="toggleGoal(this,'Skin Clarity')">Skin Clarity</button>
+              <button class="choice-btn" onclick="toggleGoal(this,'Hunter Eyes')">Hunter Eyes</button>
+              <button class="choice-btn" onclick="toggleGoal(this,'Facial Symmetry')">Facial Symmetry</button>
+              <button class="choice-btn" onclick="toggleGoal(this,'Bone Structure')">Bone Structure</button>
+              <button class="choice-btn" onclick="toggleGoal(this,'Body Composition')">Body Composition</button>
+              <button class="choice-btn" onclick="toggleGoal(this,'Hair & Grooming')">Hair & Grooming</button>
+              <button class="choice-btn" onclick="toggleGoal(this,'Overall')">Overall Optimization</button>
+            </div>
+          </div>
+          <div class="form-buttons">
+            <button class="btn-back" onclick="goStep(2)">← Back</button>
+            <button class="btn-next" onclick="goStep(4)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: UPLOAD -->
+        <div class="signup-form-step" id="form-step-4">
+          <h2 class="form-title">Upload<br>Your Face</h2>
+          <p class="form-subtitle">Front-facing, neutral expression, even lighting. No filters.</p>
+          <div class="upload-area" id="uploadArea" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)" onclick="document.getElementById('photoInput').click()">
+            <div id="uploadPlaceholder">
+              <div class="upload-icon">📷</div>
+              <div class="upload-title">Drop Photo or Click</div>
+              <div class="upload-subtitle">JPG, PNG or WEBP • Max 10MB</div>
+            </div>
+            <img id="uploadPreview" class="upload-preview">
+          </div>
+          <input type="file" id="photoInput" style="display:none" accept="image/*" onchange="handleFile(event)">
+          <div class="form-buttons">
+            <button class="btn-back" onclick="goStep(3)">← Back</button>
+            <button class="btn-next" id="analyzeBtn" onclick="startAnalysis()" disabled>Analyze Face →</button>
+          </div>
+        </div>
+
+        <!-- STEP 5: SCANNING -->
+        <div class="signup-form-step" id="form-step-5">
+          <h2 class="form-title">AI<br>Scanning</h2>
+          <p class="form-subtitle">Running 68-point facial landmark detection...</p>
+          <div class="scan-container">
+            <div class="scan-image">
+              <img id="scanImg">
+              <div class="scan-beam"></div>
+            </div>
+            <div class="scan-metrics">
+              <div class="metric-box">
+                <div class="metric-label">Symmetry</div>
+                <div class="metric-value" id="m-sym">--</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Jaw</div>
+                <div class="metric-value" id="m-jaw">--</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Eyes</div>
+                <div class="metric-value" id="m-eyes">--</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Bones</div>
+                <div class="metric-value" id="m-bones">--</div>
+              </div>
+            </div>
+          </div>
+          <div class="scan-status">
+            <div class="status-label">Status</div>
+            <div class="status-text" id="scanStatus">Initializing...</div>
+            <div class="progress-bar"><div class="progress-fill" id="scanProg"></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP DASHBOARD ═══ -->
+<div id="page-dashboard" class="page">
+  <div class="app-container">
+    <div class="app-header">
+      <div class="app-header-title" id="headerTitle">Overview</div>
+      <div class="app-header-user">
+        <div class="app-user-avatar" id="userAvatar">JD</div>
+      </div>
+    </div>
+
+    <div class="app-main">
+
+      <!-- OVERVIEW -->
+      <div class="app-view active" id="view-overview">
+        <div class="dash-grid">
+          <div class="dash-card">
+            <div class="dash-card-label">Overall Score</div>
+            <div class="dash-card-value" id="score-overall">--</div>
+            <div class="dash-card-sub up">↑ Baseline</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Program Day</div>
+            <div class="dash-card-value">1<span style="font-size:20px">/84</span></div>
+            <div class="dash-card-sub">Week 1</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Protocol</div>
+            <div class="dash-card-value" style="font-size:24px;margin-top:8px">APEX v2</div>
+            <div class="dash-card-sub">12-Week</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Rank</div>
+            <div class="dash-card-value">#412</div>
+            <div class="dash-card-sub">Top 12%</div>
+          </div>
+        </div>
+
+        <div class="section-title"><div class="section-divider"></div>12-Week Transformation</div>
+        <div class="protocol-phases" id="phasesOverview"></div>
+
+        <div class="section-title" style="margin-top:32px"><div class="section-divider"></div>Today's Tasks</div>
+        <div class="daily-checklist">
+          <div class="checklist-header">
+            <div class="checklist-header-title">Daily Protocol</div>
+            <div class="checklist-header-count">6 tasks</div>
+          </div>
+          <div class="checklist-item" onclick="toggleTask(this)">
+            <div class="checklist-checkbox"></div>
+            <div class="checklist-label">Morning Skincare Routine</div>
+            <div class="checklist-tag">5 min</div>
+          </div>
+          <div class="checklist-item" onclick="toggleTask(this)">
+            <div class="checklist-checkbox"></div>
+            <div class="checklist-label">Mewing Posture Check</div>
+            <div class="checklist-tag">Throughout day</div>
+          </div>
+          <div class="checklist-item" onclick="toggleTask(this)">
+            <div class="checklist-checkbox"></div>
+            <div class="checklist-label">Jaw Training Session</div>
+            <div class="checklist-tag">15 min</div>
+          </div>
+          <div class="checklist-item" onclick="toggleTask(this)">
+            <div class="checklist-checkbox"></div>
+            <div class="checklist-label">Supplement Stack</div>
+            <div class="checklist-tag">2 min</div>
+          </div>
+          <div class="checklist-item" onclick="toggleTask(this)">
+            <div class="checklist-checkbox"></div>
+            <div class="checklist-label">Evening Skincare</div>
+            <div class="checklist-tag">5 min</div>
+          </div>
+          <div class="checklist-item" onclick="toggleTask(this)">
+            <div class="checklist-checkbox"></div>
+            <div class="checklist-label">Sleep Optimization</div>
+            <div class="checklist-tag">Bedtime</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYSIS RESULTS -->
+      <div class="app-view" id="view-results">
+        <div class="results-score">
+          <div class="score-label">Aesthetic Baseline Score</div>
+          <div class="score-number" id="result-score">--</div>
+          <div class="score-tier" id="result-tier">ANALYZING...</div>
+          <p class="score-desc" id="result-desc"></p>
+        </div>
+        <div class="metrics-breakdown" id="metricsBreakdown"></div>
+      </div>
+
+      <!-- PROTOCOL DETAILS -->
+      <div class="app-view" id="view-protocol">
+        <div id="protocolContent"></div>
+      </div>
+
+      <!-- SUPPLEMENTS -->
+      <div class="app-view" id="view-supplements">
+        <div class="section-title"><div class="section-divider"></div>Doctor-Recommended Stack</div>
+        <div class="supplement-grid" id="supplementList"></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="app-view" id="view-settings">
+        <div class="section-title"><div class="section-divider"></div>Account Settings</div>
+        <div class="protocol-detail">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input class="form-input" id="settingsUsername" type="text">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Membership Status</label>
+            <div style="padding:14px 16px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;font-size:13px;color:var(--green);font-weight:600">BETA ACCESS - ALL FEATURES UNLOCKED</div>
+          </div>
+          <button class="btn-primary" onclick="saveSettings()" style="width:100%;margin-top:16px">Save Changes</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="app-nav">
+      <a class="app-nav-item active" onclick="switchView('overview',this)"><div class="app-nav-item-icon">📊</div>Overview</a>
+      <a class="app-nav-item" onclick="switchView('results',this)"><div class="app-nav-item-icon">🔍</div>Analysis</a>
+      <a class="app-nav-item" onclick="switchView('protocol',this)"><div class="app-nav-item-icon">📋</div>Protocol</a>
+      <a class="app-nav-item" onclick="switchView('supplements',this)"><div class="app-nav-item-icon">⚕️</div>Supps</a>
+      <a class="app-nav-item" onclick="switchView('settings',this)"><div class="app-nav-item-icon">⚙️</div>Settings</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script>
+// ── STATE ───────────────────────────────────────────────────────────────────
+let currentStep = 1;
+let userData = {
+  username: '',
+  age: 22,
+  gender: 'Male',
+  height: '5\'7"',
+  weight: 165,
+  exercisePerWeek: 3,
+  sleep: 7,
+  skinType: 'Combination',
+  diet: 'Omnivore',
+  goals: [],
+  water: 'Moderate'
+};
+let uploadedB64 = '';
+let analysisData = null;
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function switchView(viewId, btn) {
+  document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + viewId).classList.add('active');
+  document.querySelectorAll('.app-nav-item').forEach(item => item.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const titles = {overview: 'Overview', results: 'Analysis', protocol: 'Protocol', supplements: 'Supplements', settings: 'Settings'};
+  document.getElementById('headerTitle').textContent = titles[viewId] || 'APEX';
+}
+
+function goStep(n) {
+  document.querySelectorAll('.signup-form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('form-step-' + n).classList.add('active');
+  document.querySelectorAll('.signup-step').forEach((s, i) => {
+    s.classList.toggle('active', i < n);
+  });
+  currentStep = n;
+}
+
+// ── FORM HANDLERS ────────────────────────────────────────────────────────────
+function updateAge(val) {
+  userData.age = parseInt(val);
+  document.getElementById('ageDisplay').textContent = val;
+}
+
+function updateWeight(val) {
+  userData.weight = parseInt(val);
+  document.getElementById('weightDisplay').textContent = val + ' lbs';
+}
+
+function updateExercise(val) {
+  userData.exercisePerWeek = parseInt(val);
+  document.getElementById('exerciseDisplay').textContent = val + 'x/wk';
+}
+
+function updateSleep(val) {
+  userData.sleep = parseFloat(val);
+  document.getElementById('sleepDisplay').textContent = val + ' hrs';
+}
+
+function selectGender(gender, btn) {
+  userData.gender = gender;
+  btn.parentNode.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function selectSkin(skin, btn) {
+  userData.skinType = skin;
+  btn.parentNode.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function selectDiet(diet, btn) {
+  userData.diet = diet;
+  btn.parentNode.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function toggleGoal(btn, goal) {
+  btn.classList.toggle('selected');
+  const idx = userData.goals.indexOf(goal);
+  if (idx > -1) userData.goals.splice(idx, 1);
+  else userData.goals.push(goal);
+}
+
+function toggleTask(el) {
+  el.classList.toggle('done');
+}
+
+// ── PHOTO HANDLING ───────────────────────────────────────────────────────────
+function handleFile(e) {
+  processFile(e.target.files[0]);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadArea').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) processFile(f);
+}
+
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    uploadedB64 = e.target.result.split(',')[1];
+    document.getElementById('uploadPlaceholder').style.display = 'none';
+    document.getElementById('uploadPreview').style.display = 'block';
+    document.getElementById('uploadPreview').src = e.target.result;
+    document.getElementById('scanImg').src = e.target.result;
+    document.getElementById('analyzeBtn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── FACE-API ─────────────────────────────────────────────────────────────────
+const FACE_API_MODELS_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+
+async function loadFaceApi() {
+  if (window.faceapi) return;
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js';
+    s.onload = res;
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+function setProg(p, status, detail) {
+  document.getElementById('scanProg').style.width = p + '%';
+  if (status) document.getElementById('scanStatus').textContent = status;
+  if (detail) {
+    // Update metric displays if needed
+  }
+}
+
+// ── FACIAL ANALYSIS MATH ─────────────────────────────────────────────────────
+function calcSymmetry(lm) {
+  const jaw = lm.getJawOutline(), nose = lm.getNose();
+  const midX = (nose[0].x + nose[3].x) / 2;
+  let jawDiff = 0;
+  for (let i = 0; i < 8; i++) {
+    jawDiff += Math.abs(Math.abs(jaw[i].x - midX) - Math.abs(jaw[16 - i].x - midX));
+  }
+  const le = lm.getLeftEye(), re = lm.getRightEye();
+  const leW = Math.abs(le[3].x - le[0].x), reW = Math.abs(re[3].x - re[0].x);
+  const leH = Math.abs(le[4].y - le[1].y), reH = Math.abs(re[4].y - re[1].y);
+  const eyeAsymm = Math.abs(leW - reW) / ((leW + reW) / 2 + 1) * 100 + Math.abs(leH - reH) / ((leH + reH) / 2 + 1) * 100;
+  const lb = lm.getLeftEyeBrow(), rb = lm.getRightEyeBrow();
+  const lbH = lb[2].y, rbH = rb[2].y;
+  const browAsymm = Math.abs(lbH - rbH);
+  const jawScore = Math.max(0, 100 - (jawDiff / 8) * 1.4);
+  const eyeScore = Math.max(0, 100 - eyeAsymm * 1.2);
+  const browScore = Math.max(0, 100 - browAsymm * 0.8);
+  return Math.round(jawScore * 0.5 + eyeScore * 0.35 + browScore * 0.15);
+}
+
+function calcCanthalTilt(lm) {
+  const le = lm.getLeftEye(), re = lm.getRightEye();
+  const lTilt = (le[0].y - le[3].y) / Math.max(1, Math.abs(le[3].x - le[0].x));
+  const rTilt = (re[3].y - re[0].y) / Math.max(1, Math.abs(re[0].x - re[3].x));
+  const avg = (lTilt + rTilt) / 2;
+  const score = 68 + avg * 600;
+  return Math.round(Math.min(97, Math.max(36, score)));
+}
+
+function calcJaw(lm) {
+  const jaw = lm.getJawOutline();
+  const chin = jaw[8], jL = jaw[0], jR = jaw[16];
+  const jW = Math.abs(jR.x - jL.x);
+  const jMidY = (jL.y + jR.y) / 2;
+  const jH = Math.abs(chin.y - jMidY);
+  const ratio = jW / Math.max(1, jH);
+  const ratioDev = Math.abs(ratio - 1.9) * 50;
+  const lAng = jaw[4], rAng = jaw[12];
+  const angularity = (Math.abs(lAng.x - chin.x) + Math.abs(rAng.x - chin.x)) / (jW + 1);
+  const angScore = Math.min(15, angularity * 35);
+  const latScore = Math.min(10, (jW / 400) * 20);
+  const score = 100 - ratioDev + angScore + latScore;
+  return Math.round(Math.min(96, Math.max(34, score)));
+}
+
+function calcBoneStructure(lm) {
+  const jaw = lm.getJawOutline(), nose = lm.getNose(), le = lm.getLeftEye();
+  const faceW = Math.abs(jaw[16].x - jaw[0].x);
+  const noseH = Math.abs(nose[0].y - nose[3].y);
+  const noseBonus = Math.min(10, (noseH / (faceW * 0.45)) * 18);
+  const cheekScore = 50 + (faceW / 320) * 30 + noseBonus;
+  const lb = lm.getLeftEyeBrow();
+  const browToEye = Math.abs(lb[2].y - le[1].y) / (faceW + 1) * 100;
+  const browBonus = Math.min(8, browToEye * 1.5);
+  return Math.round(Math.min(94, Math.max(36, cheekScore + browBonus)));
+}
+
+function calcFacialHarmony(lm) {
+  const jaw = lm.getJawOutline(), le = lm.getLeftEye(), nose = lm.getNose();
+  const top = le[1].y, bot = jaw[8].y, totalH = bot - top;
+  if (totalH <= 0) return 65;
+  const upper = le[1].y - top, middle = nose[3].y - le[1].y, lower = bot - nose[3].y;
+  const avg = totalH / 3;
+  const dev = Math.abs(upper - avg) + Math.abs(middle - avg) + Math.abs(lower - avg);
+  const score = 100 - (dev / totalH) * 85;
+  return Math.round(Math.min(95, Math.max(40, score)));
+}
+
+function calcSkinProxy(ud) {
+  let base = 65;
+  const age = ud.age || 22;
+  if (age < 20) base += 8; else if (age < 25) base += 4; else if (age > 35) base -= 6; else if (age > 30) base -= 3;
+  const slp = ud.sleep || 7;
+  if (slp >= 8) base += 8; else if (slp >= 7) base += 3; else if (slp < 6) base -= 9;
+  if (ud.diet === 'Mediterranean') base += 6; else if (ud.diet === 'Vegan') base += 3; else if (ud.diet === 'Keto') base -= 2;
+  if (ud.skinType === 'Acne-prone') base -= 7; else if (ud.skinType === 'Oily') base -= 3;
+  const ex = ud.exercisePerWeek || 0;
+  if (ex >= 4) base += 5; else if (ex >= 2) base += 2; else if (ex === 0) base -= 4;
+  return Math.round(Math.min(96, Math.max(34, base)));
+}
+
+// ── PROTOCOL GENERATION ──────────────────────────────────────────────────────
+function generate12WeekProtocol(scores, ud) {
+  const phases = [
+    {
+      num: 1,
+      name: 'Foundation',
+      weeks: '1-3',
+      focus: 'Establish daily habits and baseline skin health',
+      skincare: 'Double cleanse AM/PM, Vitamin C serum (AM), Gentle moisturizer, SPF 50 daily',
+      jaw: '24/7 mewing posture, mastic gum 10 min daily, jaw trainer 2x/week',
+      lifestyle: '8+ hours sleep, reduce sodium to <2g/day, increase water to 2.5L/day',
+      supplements: ['Vitamin D3 + K2', 'Zinc Bisglycinate', 'Magnesium Glycinate', 'Omega-3 Fish Oil']
+    },
+    {
+      num: 2,
+      name: 'Acceleration',
+      weeks: '4-6',
+      focus: 'Intensify structural changes and skin optimization',
+      skincare: 'Add Retinol 0.025% 2x/week (PM), increase Vitamin C concentration, hyaluronic acid serum',
+      jaw: 'Mewing 24/7, mastic gum 15 min 2x/daily, jaw trainer 3x/week with progressive resistance',
+      lifestyle: 'Maintain 8+ hours sleep, cold compress 2 min AM for eye area, posture correction drills 2x/day',
+      supplements: ['Vitamin D3 + K2', 'Zinc Bisglycinate', 'Magnesium Glycinate', 'Omega-3 Fish Oil', 'Collagen Peptides']
+    },
+    {
+      num: 3,
+      name: 'Refinement',
+      weeks: '7-9',
+      focus: 'Visible structural gains and skin clarity peak',
+      skincare: 'Retinol 0.05% 2x/week, Vitamin C + Ferulic Acid (AM), nightly hydration mask 2x/week',
+      jaw: 'Full-time mewing, mastic gum 20 min 2x/daily, jaw trainer 4x/week, add neck training',
+      lifestyle: 'Sleep optimization: consistent 8-9 hours, suborbital lymphatic drainage massage daily',
+      supplements: ['Vitamin D3 + K2', 'Zinc Bisglycinate', 'Magnesium Glycinate', 'Omega-3 Fish Oil', 'Collagen Peptides', 'Astaxanthin']
+    },
+    {
+      num: 4,
+      name: 'Mastery',
+      weeks: '10-12',
+      focus: 'Consolidate gains and establish maintenance protocol',
+      skincare: 'Retinol 0.1% 2x/week, advanced serums, professional facial 1x/month',
+      jaw: 'Maintain mewing, mastic gum 20 min daily, jaw trainer 3x/week for maintenance',
+      lifestyle: 'Maintain sleep, continue posture work, track progress with photos',
+      supplements: ['Vitamin D3 + K2', 'Zinc Bisglycinate', 'Magnesium Glycinate', 'Omega-3 Fish Oil', 'Collagen Peptides']
+    }
+  ];
+  return phases;
+}
+
+function generateSuggestions(scores, ud) {
+  const s = [];
+  if (scores.jaw_definition < 62) {
+    s.push({
+      area: 'Jaw Definition',
+      priority: 'High',
+      action: 'Begin 24/7 mewing posture immediately + mastic gum 15 min 2×/daily + jaw trainer 3×/week progressive resistance.',
+      reason: 'Your jaw width-to-height ratio indicates significant structural improvement potential.'
+    });
+  }
+  if (scores.eye_area < 58) {
+    s.push({
+      area: 'Eye Area',
+      priority: 'High',
+      action: 'Prioritize 8+ hour sleep, reduce sodium below 2g/day, cold compress 60 sec AM, daily suborbital lymphatic massage.',
+      reason: 'Your canthal tilt score indicates drooping or significant puffiness.'
+    });
+  }
+  if (scores.facial_symmetry < 66) {
+    s.push({
+      area: 'Facial Symmetry',
+      priority: 'Medium',
+      action: 'Daily posture correction: chin level, shoulders retracted. Sleep on your back.',
+      reason: 'Measured jaw and eye asymmetry detected.'
+    });
+  }
+  if (scores.skin_quality < 64) {
+    s.push({
+      area: 'Skin Quality',
+      priority: 'High',
+      action: 'Double cleanse AM/PM, Vitamin C serum every morning, retinol 0.025% 3×/week PM, SPF 50+ daily.',
+      reason: 'Your lifestyle profile suggests significant skin improvement potential.'
+    });
+  }
+  return s.slice(0, 5);
+}
+
+function buildSuppList(scores, ud) {
+  return [
+    {name: 'Vitamin D3 + K2', dose: '5000 IU + 100mcg', timing: 'Morning with fat', desc: 'Regulates testosterone and skin cell proliferation. Most adults deficient.', tier: 'Essential'},
+    {name: 'Zinc Bisglycinate', dose: '15-25mg', timing: 'Evening with food', desc: 'Required for collagen production, hormone synthesis, and sebum regulation.', tier: 'Essential'},
+    {name: 'Magnesium Glycinate', dose: '200-400mg', timing: '30 min before bed', desc: 'Improves sleep quality, muscle recovery, and reduces inflammation.', tier: 'Essential'},
+    {name: 'Omega-3 Fish Oil', dose: '2g', timing: 'With meals', desc: 'Reduces systemic inflammation and supports skin barrier function.', tier: 'Essential'},
+    {name: 'Collagen Peptides', dose: '10g', timing: 'Morning with water', desc: 'Increases skin elasticity and hydration. Bioavailable form.', tier: 'Recommended'},
+    {name: 'Astaxanthin', dose: '4mg', timing: 'With fat-containing meal', desc: 'Potent antioxidant for eye health and skin protection from UV damage.', tier: 'Recommended'}
+  ];
+}
+
+// ── MAIN ANALYSIS ENGINE ─────────────────────────────────────────────────────
+async function startAnalysis() {
+  userData.username = document.getElementById('username').value || 'User';
+  goStep(5);
+  setProg(10, 'Initializing Engine', 'Loading local neural weights...');
+  
+  try {
+    await loadFaceApi();
+    setProg(30, 'Loading Models', 'Downloading face detector & landmarks...');
+    await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_API_MODELS_URL);
+    await faceapi.nets.faceLandmark68Net.loadFromUri(FACE_API_MODELS_URL);
+    
+    setProg(50, 'Mapping Face', 'Detecting 68 facial landmarks...');
+    const img = document.getElementById('scanImg');
+    const det = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+    if (!det) throw new Error('No face detected. Use a clear, front-facing photo.');
+    
+    const lm = det.landmarks;
+    setProg(70, 'Analyzing Metrics', 'Calculating symmetry and ratios...');
+    
+    const scores = {
+      facial_symmetry: calcSymmetry(lm),
+      eye_area: calcCanthalTilt(lm),
+      jaw_definition: calcJaw(lm),
+      bone_structure: calcBoneStructure(lm),
+      facial_harmony: calcFacialHarmony(lm),
+      skin_quality: calcSkinProxy(userData)
+    };
+    scores.overall = Math.round((scores.facial_symmetry + scores.eye_area + scores.jaw_definition + scores.bone_structure + scores.facial_harmony + scores.skin_quality) / 6);
+    
+    document.getElementById('m-sym').textContent = scores.facial_symmetry;
+    document.getElementById('m-jaw').textContent = scores.jaw_definition;
+    document.getElementById('m-eyes').textContent = scores.eye_area;
+    document.getElementById('m-bones').textContent = scores.bone_structure;
+    
+    setProg(90, 'Building Protocol', 'Personalizing 12-week roadmap...');
+    
+    let tier = 'Average';
+    if (scores.overall > 82) tier = 'Elite Aesthetic';
+    else if (scores.overall > 76) tier = 'Attractive';
+    else if (scores.overall > 68) tier = 'Above Average';
+    
+    analysisData = {
+      scores: scores,
+      tier: tier,
+      phases: generate12WeekProtocol(scores, userData),
+      suggestions: generateSuggestions(scores, userData),
+      supps: buildSuppList(scores, userData),
+      verdict: `Your analysis indicates a ${tier.toLowerCase()} foundation. Targeted improvements will yield significant structural gains.`
+    };
+    
+    setTimeout(() => {
+      setProg(100, 'Complete', 'Analysis finalized.');
+      populateResults();
+      showPage('dashboard');
+    }, 800);
+  } catch (e) {
+    setProg(10, 'Error', e.message);
+    document.getElementById('scanProg').style.background = 'var(--red)';
+  }
+}
+
+function populateResults() {
+  const d = analysisData;
+  const user = userData.username;
+  
+  // Update header
+  document.getElementById('userAvatar').textContent = user.slice(0, 2).toUpperCase();
+  document.getElementById('settingsUsername').value = user;
+  
+  // Overview stats
+  document.getElementById('score-overall').textContent = d.scores.overall;
+  
+  // Phases overview
+  let phasesHtml = '';
+  d.phases.forEach(p => {
+    phasesHtml += `
+      <div class="phase-card">
+        <div class="phase-number">Phase ${p.num}</div>
+        <div class="phase-name">${p.name}</div>
+        <div class="phase-duration">Weeks ${p.weeks}</div>
+        <div class="phase-desc">${p.focus}</div>
+      </div>
+    `;
+  });
+  document.getElementById('phasesOverview').innerHTML = phasesHtml;
+  
+  // Results
+  document.getElementById('result-score').textContent = d.scores.overall;
+  document.getElementById('result-tier').textContent = d.tier.toUpperCase();
+  document.getElementById('result-desc').textContent = d.verdict;
+  
+  // Metrics breakdown
+  let metricsHtml = '';
+  const metricLabels = {
+    facial_symmetry: 'Facial Symmetry',
+    eye_area: 'Eye Area',
+    jaw_definition: 'Jaw Definition',
+    bone_structure: 'Bone Structure',
+    facial_harmony: 'Facial Harmony',
+    skin_quality: 'Skin Quality'
+  };
+  Object.entries(d.scores).forEach(([k, v]) => {
+    if (k === 'overall') return;
+    metricsHtml += `
+      <div class="metric-card">
+        <div class="metric-card-label">${metricLabels[k]}</div>
+        <div class="metric-card-row">
+          <div class="metric-card-val">${v}</div>
+          <div style="font-size:11px;color:var(--dim)">/ 100</div>
+        </div>
+        <div class="metric-card-bar"><div class="metric-card-fill" style="width:${v}%"></div></div>
+      </div>
+    `;
+  });
+  document.getElementById('metricsBreakdown').innerHTML = metricsHtml;
+  
+  // Protocol details
+  let protocolHtml = '';
+  d.phases.forEach(phase => {
+    protocolHtml += `
+      <div class="protocol-detail">
+        <div class="protocol-detail-header">
+          <div class="protocol-icon">📍</div>
+          <div>
+            <div class="protocol-detail-title">Phase ${phase.num}: ${phase.name}</div>
+            <div class="protocol-detail-subtitle">Weeks ${phase.weeks}</div>
+          </div>
+        </div>
+        <div class="protocol-focus">
+          <div class="focus-label">Focus Area</div>
+          <div class="focus-text">${phase.focus}</div>
+        </div>
+        <div class="protocol-grid">
+          <div class="protocol-box">
+            <div class="protocol-box-label">Skincare</div>
+            <div class="protocol-box-text">${phase.skincare}</div>
+          </div>
+          <div class="protocol-box">
+            <div class="protocol-box-label">Jaw Training</div>
+            <div class="protocol-box-text">${phase.jaw}</div>
+          </div>
+        </div>
+        <div class="protocol-box">
+          <div class="protocol-box-label">Lifestyle</div>
+          <div class="protocol-box-text">${phase.lifestyle}</div>
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:10px">Supplement Focus</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            ${phase.supplements.map(s => `<div style="font-size:11px;background:var(--red-light);border:1px solid rgba(232,25,44,.3);padding:6px 10px;border-radius:6px;color:var(--off)">${s}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('protocolContent').innerHTML = protocolHtml;
+  
+  // Supplements
+  let suppHtml = '';
+  d.supps.forEach(s => {
+    suppHtml += `
+      <div class="supplement-card">
+        <div class="supp-name">${s.name}</div>
+        <div class="supp-dose">${s.dose}</div>
+        <div class="supp-desc">${s.desc}</div>
+        <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px">
+          <div style="color:var(--dim)">🕒 ${s.timing}</div>
+          <div style="background:rgba(0,232,122,.1);color:var(--green);padding:4px 8px;border-radius:4px;font-weight:600">${s.tier}</div>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById('supplementList').innerHTML = suppHtml;
+}
+
+function saveSettings() {
+  const user = document.getElementById('settingsUsername').value;
+  document.getElementById('userAvatar').textContent = user.slice(0, 2).toUpperCase();
+  alert('Settings saved locally.');
+}
+
+function scrollToInfo() {
+  // Placeholder for landing page scroll
+}
+</script>
+</body>
+</html>
